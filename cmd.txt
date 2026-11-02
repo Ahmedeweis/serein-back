@@ -1,5 +1,2 @@
 php artisan serve
 GTanG&JeNZw8
-
-في الفرونت إند عندك (Nuxt)، خلي روابط الصور تشاور على الـ API ده بدل الرابط المباشر للـ storage
-(https://rosybrown-sandpiper-957711.hostingersite.com/api/images/products/gallery/filename.jpg)

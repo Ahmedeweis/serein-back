@@ -26,10 +26,6 @@ class Product extends Model
         'rating',
         'reviews_count',
         'is_best_seller',
-        'best_seller_position',
-        'featured_position',
-        'trending_position',
-        'new_arrival_position',
         'is_featured',
         'is_trending',
         'is_new_arrival',
@@ -40,10 +36,6 @@ class Product extends Model
         'rating'         => 'float',
         'reviews_count'  => 'integer',
         'is_best_seller' => 'boolean',
-        'best_seller_position' => 'integer',
-        'featured_position'    => 'integer',
-        'trending_position'    => 'integer',
-        'new_arrival_position' => 'integer',
         'is_featured'    => 'boolean',
         'is_trending'    => 'boolean',
         'is_new_arrival' => 'boolean',
@@ -247,25 +239,6 @@ class Product extends Model
     public function scopeBestSeller($query)
     {
         return $query->where('is_best_seller', true);
-    }
-
-    /**
-     * Showcase sections that can be manually ordered from the dashboard:
-     * section => [flag column, position column]
-     */
-    public const SHOWCASE_SECTIONS = [
-        'best_seller' => ['is_best_seller', 'best_seller_position'],
-        'featured'    => ['is_featured', 'featured_position'],     // shown as "Bundles" on the storefront
-        'new_arrival' => ['is_new_arrival', 'new_arrival_position'],
-        'trending'    => ['is_trending', 'trending_position'],
-    ];
-
-    /** Section display order: positioned products first (1, 2, 3…), unpositioned ones last */
-    public function scopeOrderByShowcasePosition($query, string $section)
-    {
-        $column = self::SHOWCASE_SECTIONS[$section][1];
-
-        return $query->orderByRaw("{$column} IS NULL")->orderBy($column);
     }
 
     public function scopeTrending($query)

@@ -105,11 +105,6 @@ class ProductCatalogController extends Controller
             });
         }
 
-        // Showcase sections follow the order set in the dashboard, before any other sorting
-        if (isset(Product::SHOWCASE_SECTIONS[$flag])) {
-            $query->orderByShowcasePosition($flag);
-        }
-
         // Sorting
         $sort = $request->query('sort', 'latest');
         match ($sort) {

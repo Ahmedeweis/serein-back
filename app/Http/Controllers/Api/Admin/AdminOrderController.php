@@ -19,35 +19,8 @@ class AdminOrderController extends Controller
 
     public function index(Request $request): JsonResponse
     {
-        $query = $this->filteredQuery($request);
-
-        $perPage = (int) $request->query('per_page', 20);
-        $orders  = $query->paginate($perPage);
-
-        return response()->json([
-            'data'         => $orders->items(),
-            'current_page' => $orders->currentPage(),
-            'last_page'    => $orders->lastPage(),
-            'total'        => $orders->total(),
-        ]);
-    }
-
-    // ── Export (all matching orders, no pagination) ───────────────────────────
-
-    public function export(Request $request): JsonResponse
-    {
-        return response()->json(['data' => $this->filteredQuery($request)->get()]);
-    }
-
-    private function filteredQuery(Request $request)
-    {
         $query = Order::with(['items', 'shippingZone'])
             ->orderByDesc('created_at');
-
-        // Only specific orders (e.g. the ones selected in the dashboard)
-        if ($ids = $request->query('ids')) {
-            $query->whereIn('id', array_map('intval', (array) $ids));
-        }
 
         // Filter by status
         if ($status = $request->query('status')) {
@@ -69,7 +42,15 @@ class AdminOrderController extends Controller
             });
         }
 
-        return $query;
+        $perPage = (int) $request->query('per_page', 20);
+        $orders  = $query->paginate($perPage);
+
+        return response()->json([
+            'data'         => $orders->items(),
+            'current_page' => $orders->currentPage(),
+            'last_page'    => $orders->lastPage(),
+            'total'        => $orders->total(),
+        ]);
     }
 
     // ── Show ──────────────────────────────────────────────────────────────────
@@ -330,25 +311,6 @@ class AdminOrderController extends Controller
         $order->delete();
 
         return response()->json(['message' => 'Order deleted successfully.']);
-    }
-
-    // ── Bulk Destroy ──────────────────────────────────────────────────────────
-
-    public function bulkDestroy(Request $request): JsonResponse
-    {
-        $validated = $request->validate([
-            'ids'   => ['required', 'array', 'min:1'],
-            'ids.*' => ['integer', 'distinct'],
-        ]);
-
-        $deleted = DB::transaction(
-            fn () => Order::whereIn('id', $validated['ids'])->delete()
-        );
-
-        return response()->json([
-            'message' => "{$deleted} order(s) deleted successfully.",
-            'deleted' => $deleted,
-        ]);
     }
 
     // ── Stats ─────────────────────────────────────────────────────────────────

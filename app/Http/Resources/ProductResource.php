@@ -26,8 +26,7 @@ class ProductResource extends JsonResource
 
         // Primary image & Gallery images mapping
         $images = [];
-        // Products without an image (e.g. imported from Excel) show a placeholder until one is uploaded
-        $primaryImageUrl = $this->image_url ?: asset('images/products/default.svg');
+        $primaryImageUrl = $this->image_url ?: asset('images/products/default.webp');
         $images[] = [
             'id'         => 1,
             'url'        => $primaryImageUrl,
@@ -102,10 +101,6 @@ class ProductResource extends JsonResource
             'stock'          => (int) $totalStock,
             'isFeatured'     => (bool) $this->is_featured,
             'isBestSeller'   => (bool) $this->is_best_seller,
-            'bestSellerPosition' => $this->best_seller_position,
-            'featuredPosition'   => $this->featured_position,
-            'trendingPosition'   => $this->trending_position,
-            'newArrivalPosition' => $this->new_arrival_position,
             'isTrending'     => (bool) $this->is_trending,
             'isNewArrival'   => (bool) $this->is_new_arrival,
             'createdAt'      => $this->created_at?->toIso8601String() ?? now()->toIso8601String(),

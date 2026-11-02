@@ -169,33 +169,4 @@ class AdminShippingMethodController extends Controller
             'data'      => $method,
         ]);
     }
-
-    // ── Logo (optional image shown instead of the built-in badge) ─────────────
-
-    public function uploadLogo(Request $request, string $id): JsonResponse
-    {
-        $method = ShippingMethod::findOrFail($id);
-
-        $request->validate([
-            'logo' => ['required', 'file', 'image', 'mimes:png,jpg,jpeg,webp', 'max:1024'],
-        ]);
-
-        $method->replaceLogo($request->file('logo'), 'logos/shipping');
-
-        return response()->json([
-            'message' => 'Logo uploaded successfully',
-            'data'    => $method,
-        ]);
-    }
-
-    public function removeLogo(string $id): JsonResponse
-    {
-        $method = ShippingMethod::findOrFail($id);
-        $method->removeLogo();
-
-        return response()->json([
-            'message' => 'Logo removed successfully',
-            'data'    => $method,
-        ]);
-    }
 }

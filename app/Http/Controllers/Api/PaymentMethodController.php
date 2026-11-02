@@ -39,8 +39,6 @@ class PaymentMethodController extends Controller
                     'description_en' => $m->description_en,
                     'description_ar' => $m->description_ar,
                     'badge' => $m->badge,
-                    'logo_url' => $m->logo_url,
-                    'logoUrl' => $m->logo_url,
                     'instructions' => [
                         'en' => $m->instructions_en ?? '',
                         'ar' => $m->instructions_ar ?? '',

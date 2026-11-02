@@ -2,13 +2,12 @@
 
 namespace App\Models;
 
-use App\Models\Concerns\HasUploadedLogo;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
 class PaymentMethod extends Model
 {
-    use HasFactory, HasUploadedLogo;
+    use HasFactory;
 
     protected $table = 'payment_methods';
     protected $primaryKey = 'id';

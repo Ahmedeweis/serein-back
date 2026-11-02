@@ -11,9 +11,6 @@ use App\Http\Controllers\Api\Admin\AdminShippingZoneController;
 use App\Http\Controllers\Api\Admin\AdminPostController;
 use App\Http\Controllers\Api\Admin\AdminCustomerController;
 use App\Http\Controllers\Api\Admin\AdminCouponController;
-use App\Http\Controllers\Api\Admin\AdminTrackingPixelController;
-use App\Http\Controllers\Api\Admin\AdminSiteSettingsController;
-use App\Http\Controllers\Api\Admin\AdminHeroSlideController;
 use App\Http\Controllers\Api\AuthController;
 use App\Http\Controllers\Api\CategoryController;
 use App\Http\Controllers\Api\CouponController;
@@ -25,9 +22,6 @@ use App\Http\Controllers\Api\PostController;
 use App\Http\Controllers\Api\ReviewController;
 use App\Http\Controllers\Api\ShippingMethodController;
 use App\Http\Controllers\Api\ShippingZoneController;
-use App\Http\Controllers\Api\TrackingPixelController;
-use App\Http\Controllers\Api\SiteSettingsController;
-use App\Http\Controllers\Api\HeroSlideController;
 use Illuminate\Support\Facades\Route;
 
 // ─── Public Catalog ───────────────────────────────────────────────────────────
@@ -42,9 +36,6 @@ Route::middleware('auth:sanctum')->get('/orders/{order}', [OrderController::clas
 Route::post('/coupons/validate', [CouponController::class, 'validateCoupon'])
     ->middleware('throttle:10,1'); // Fix: max 10 attempts per minute per IP — prevents coupon enumeration brute-force
 Route::get('/analytics/monthly-sales', [AdminDashboardController::class, 'monthlySales']);
-Route::get('/tracking-pixels', [TrackingPixelController::class, 'index']); // Storefront: enabled pixel IDs
-Route::get('/site-settings', [SiteSettingsController::class, 'index']); // Storefront: announcement bar & favicon
-Route::get('/hero-slides', [HeroSlideController::class, 'index']); // Storefront: home page slider
 
 Route::prefix('products')->group(function () {
     Route::get('/', [ProductCatalogController::class, 'index']);
@@ -105,33 +96,6 @@ Route::middleware(['auth:sanctum', 'admin'])->prefix('admin')->group(function ()
     Route::get('/monthly-sales', [AdminDashboardController::class, 'monthlySales']);
     Route::get('/dashboard/monthly-sales', [AdminDashboardController::class, 'monthlySales']);
 
-    // Admin Hero Slider (home page)
-    Route::prefix('hero-slides')->group(function () {
-        Route::get('/', [AdminHeroSlideController::class, 'index']);
-        Route::post('/', [AdminHeroSlideController::class, 'store']);
-        Route::put('/order', [AdminHeroSlideController::class, 'reorder']);
-        Route::post('/{id}', [AdminHeroSlideController::class, 'update']);
-        Route::delete('/{id}', [AdminHeroSlideController::class, 'destroy']);
-        Route::patch('/{id}/toggle-active', [AdminHeroSlideController::class, 'toggleActive']);
-    });
-
-    // Admin Site Settings: announcement bar & favicon
-    Route::prefix('site-settings')->group(function () {
-        Route::get('/', [AdminSiteSettingsController::class, 'show']);
-        Route::put('/announcement-bar', [AdminSiteSettingsController::class, 'updateAnnouncement']);
-        Route::post('/announcement-bar/logo', [AdminSiteSettingsController::class, 'uploadAnnouncementLogo']);
-        Route::delete('/announcement-bar/logo', [AdminSiteSettingsController::class, 'removeAnnouncementLogo']);
-        Route::put('/features', [AdminSiteSettingsController::class, 'updateFeatures']);
-        Route::post('/features/{index}/icon', [AdminSiteSettingsController::class, 'uploadFeatureIcon'])->whereNumber('index');
-        Route::delete('/features/{index}/icon', [AdminSiteSettingsController::class, 'removeFeatureIcon'])->whereNumber('index');
-        Route::post('/favicon', [AdminSiteSettingsController::class, 'uploadFavicon']);
-        Route::delete('/favicon', [AdminSiteSettingsController::class, 'removeFavicon']);
-    });
-
-    // Admin Tracking Pixels (Meta, Google, TikTok, Snapchat)
-    Route::get('/tracking-pixels', [AdminTrackingPixelController::class, 'show']);
-    Route::put('/tracking-pixels', [AdminTrackingPixelController::class, 'update']);
-
     // Admin Categories CRUD
     Route::prefix('categories')->group(function () {
         Route::get('/', [AdminCategoryController::class, 'index']);
@@ -147,11 +111,6 @@ Route::middleware(['auth:sanctum', 'admin'])->prefix('admin')->group(function ()
         Route::get('/', [AdminProductController::class, 'index']);
         Route::post('/', [AdminProductController::class, 'store']);
         Route::get('/lookup', [AdminProductController::class, 'lookup']); // ← lightweight dropdown
-        Route::get('/export', [AdminProductController::class, 'export']);
-        Route::post('/import', [AdminProductController::class, 'import']);
-        // Manual order of showcase sections: best_seller | featured (bundles) | new_arrival | trending
-        Route::get('/showcase/{section}', [AdminProductController::class, 'showcase']);
-        Route::put('/showcase/{section}/order', [AdminProductController::class, 'reorderShowcase']);
         Route::get('/{id}', [AdminProductController::class, 'show']);
         Route::post('/{id}', [AdminProductController::class, 'update']);
         Route::put('/{id}', [AdminProductController::class, 'update']);
@@ -175,8 +134,6 @@ Route::middleware(['auth:sanctum', 'admin'])->prefix('admin')->group(function ()
         Route::put('/{id}', [AdminShippingMethodController::class, 'update']);
         Route::delete('/{id}', [AdminShippingMethodController::class, 'destroy']);
         Route::patch('/{id}/toggle-active', [AdminShippingMethodController::class, 'toggleActive']);
-        Route::post('/{id}/logo', [AdminShippingMethodController::class, 'uploadLogo']);
-        Route::delete('/{id}/logo', [AdminShippingMethodController::class, 'removeLogo']);
     });
 
     // Admin Payment Methods CRUD & Toggle
@@ -187,8 +144,6 @@ Route::middleware(['auth:sanctum', 'admin'])->prefix('admin')->group(function ()
         Route::put('/{id}', [AdminPaymentMethodController::class, 'update']);
         Route::delete('/{id}', [AdminPaymentMethodController::class, 'destroy']);
         Route::patch('/{id}/toggle-active', [AdminPaymentMethodController::class, 'toggleActive']);
-        Route::post('/{id}/logo', [AdminPaymentMethodController::class, 'uploadLogo']);
-        Route::delete('/{id}/logo', [AdminPaymentMethodController::class, 'removeLogo']);
     });
 
     // Admin Orders CRUD & Status Management
@@ -196,8 +151,6 @@ Route::middleware(['auth:sanctum', 'admin'])->prefix('admin')->group(function ()
         Route::get('/', [AdminOrderController::class, 'index']);
         Route::post('/', [AdminOrderController::class, 'store']);
         Route::get('/stats', [AdminOrderController::class, 'stats']);
-        Route::get('/export', [AdminOrderController::class, 'export']);
-        Route::post('/bulk-delete', [AdminOrderController::class, 'bulkDestroy']);
         Route::get('/{id}', [AdminOrderController::class, 'show']);
         Route::put('/{id}', [AdminOrderController::class, 'update']);
         Route::patch('/{id}/status', [AdminOrderController::class, 'updateStatus']);

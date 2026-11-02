@@ -45,8 +45,6 @@ class ShippingMethodController extends Controller
                     ],
                     'logo_type' => $m->logo_type,
                     'logoType' => $m->logo_type,
-                    'logo_url' => $m->logo_url,
-                    'logoUrl' => $m->logo_url,
                     'is_active' => (bool) $m->is_active,
                     'sort_order' => (int) $m->sort_order,
                 ];
